@@ -1,0 +1,33 @@
+{{if (totalPage > 0)}}
+<div class="page">
+    <a class="page-prev icon-font icon-angle-left {{currentPage === 1 ? 'disabled' : ''}}"></a>
+    {{if (currentPage > 6)}}
+        <a class="page-item">1</a>
+        <a class="page-item disabled">...</a>
+    {{/if}}
+    {{if (currentPage - 3 >= 1)}}
+        <a class="page-itemt">{{currentPage - 3}}</a>
+    {{/if}}
+    {{if (currentPage - 2 >= 1)}}
+        <a class="page-itemt">{{currentPage - 2}}</a>
+    {{/if}}
+    {{if (currentPage - 1 >= 1)}}
+        <a class="page-itemt">{{currentPage - 1}}</a>
+    {{/if}}
+    <a class="page-itemt page-current">{{currentPage}}</a>
+    {{if (currentPage + 1 <= totalPage)}}
+        <a class="page-itemt">{{currentPage + 1}}</a>
+    {{/if}}
+    {{if (currentPage + 2 <= totalPage)}}
+        <a class="page-itemt">{{currentPage + 2}}</a>
+    {{/if}}
+    {{if (currentPage + 3 <= totalPage)}}
+        <a class="page-itemt">{{currentPage + 3}}</a>
+    {{/if}}
+     {{if (currentPage + 4 <= totalPage)}}
+        <a class="page-item disabled">...</a>
+        <a class="page-item">{{totalPage}}</a>
+    {{/if}}
+    <a class="page-next icon-font icon-angle-right {{currentPage === totalPage || totalPage <= 1 ? 'disabled' : ''"></a>
+</div>
+{{/if}}

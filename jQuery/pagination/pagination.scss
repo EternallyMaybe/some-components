@@ -1,0 +1,48 @@
+.page,.page a {
+    text-align: center
+}
+
+.page a {
+    box-sizing: border-box;
+    display: inline-block;
+    height: 24px;
+    margin: 0 3px;
+    line-height: 24px;
+    font-size: 14px;
+    vertical-align: middle;
+    color: #999;
+    cursor: pointer
+}
+
+.page-item:not(.disabled) {
+    width: 24px
+}
+
+.page-item:not(.disabled):hover {
+    color: #00a7ec
+}
+
+.page .both-ends {
+    margin: 0 13px;
+    width: 30px
+}
+
+.page .disabled {
+    cursor: not-allowed;
+    color: #ccc
+}
+
+.page .page-current {
+    color: #00a7ec
+}
+
+.page-next,.page-prev {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 40px;
+    background-color: #fff
+}
+
+.page-next.disabled,.page-prev.disabled {
+    border: 1px solid #e5e5e5
+}

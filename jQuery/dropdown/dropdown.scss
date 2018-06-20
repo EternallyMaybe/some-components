@@ -1,0 +1,72 @@
+.dropdown {
+    position: relative
+}
+
+.dropdown .dropdown-btn {
+    padding: 9px 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    min-width: 98px;
+    line-height: 1.2;
+    background-color: #f7f7f7;
+    cursor: pointer
+}
+
+.dropdown .dropdown-btn i {
+    position: absolute;
+    top: 14px;
+    right: 10px
+}
+
+.dropdown .dropdown-btn:hover {
+    border: 1px solid #ccc
+}
+
+.dropdown .dropdown-btn:focus {
+    border: 1px solid #00a7ec
+}
+
+.dropdown .dropdown-header {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #00a7ec;
+    cursor: pointer
+}
+
+.dropdown .dropdown-header .icon-drop,.dropdown .dropdown-header .icon-drop-hover {
+    margin-left: 14px
+}
+
+.dropdown .dropdown-menu {
+    overflow: hidden;
+    position: absolute;
+    top: 12px;
+    left: -1px;
+    z-index: 4;
+    box-sizing: border-box;
+    height: 0;
+    width: 142px;
+    transition: all .3s
+}
+
+.dropdown .dropdown-menu .dropdown-content {
+    overflow: auto;
+    margin-top: 16px;
+    box-shadow: 0 1px 12px 0 rgba(51,51,51,.2);
+    border: 1px solid #ccc;
+    max-height: 280px;
+    background-color: #f7f7f7
+}
+
+.dropdown .dropdown-menu .dropdown-item {
+    padding-left: 15px;
+    height: 26px;
+    line-height: 26px;
+    font-size: 12px;
+    cursor: pointer
+}
+
+.dropdown .dropdown-menu .dropdown-item:hover {
+    background-color: #eee
+}

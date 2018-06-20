@@ -1,0 +1,7 @@
+<div class="image-pagation">
+    <div class="icon-font icon-angle-left pagation-pre"></div>
+    <div class="icon-font icon-angle-left pagation-next"></div>
+    <div class="container">
+        <div class="panel"></div>
+    </div>
+</div>
