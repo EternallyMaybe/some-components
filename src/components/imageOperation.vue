@@ -1,35 +1,33 @@
 <template>
     <div class="image-operation">
         <div class="operations">
-            <div class="operation-item pick-up">
+            <div class="operation-item pick-up" @click.stop="pickup">
                 <i class="icon-pickup"></i>收起
             </div>
-            <div class="operation-item view-original">
+            <div class="operation-item view-original" @click.stop="viewOriginal">
                 <i class="icon-view"></i>查看大图
             </div>
-            <div class="operation-item turn-left">
+            <div class="operation-item turn-left" @click.stop="turn(-90)">
                 <i class="icon-turn-left"></i>向左转
             </div>
-            <div class="operation-item turn-right">
+            <div class="operation-item turn-right" @click.stop="turn(90)">
                 <i class="icon-turn-right"></i>向右转
             </div>
         </div>
-        <div class="big-img" style="height: auto;">
-            <img src="http://img.bbs.duoyi.com/images/c2/6e/c26eaf4268cf00a98f1884182002606a-14424-270x93.png"
-            class="operation-img" style="transform: rotate(0deg); margin-top: 0px;">
+        <div class="big-img" :style="{height: areaHeight}">
+            <img :src="formatImages[currentIndex]" 
+                class="operation-img"
+                :class="{'limit-height': isLimit}"
+                :style="{transform: `rotate(${rotate}deg)`, marginTop: `${marginTop}px`}"
+                ref="image">
         </div>
-        <div class="small-images">
-            <div class="img-box img-selected">
-                <img src="http://img.bbs.duoyi.com/images/c2/6e/c26eaf4268cf00a98f1884182002606a-14424-270x93.png"
-                class="fixed-height">
-            </div>
-            <div class="img-box">
-                <img src="http://img.bbs.duoyi.com/images/df/d9/dfd91ebff7d402e8542e1871c393128c-4265-64x43.png"
-                    class="fixed-height">
-            </div>
-            <div class="img-box">
-                <img src="http://img.bbs.duoyi.com/images/36/30/3630aaf8f76ca0a396b2804b2605ee73-76027-201x207.png"
-                    class="fixed-width">
+        <div class="small-images" v-if="formatImages.length > 1">
+            <div v-for="(img, index) in formatImages" 
+                :key="index"
+                class="img-box"
+                :class="{'img-selected': index === currentIndex}"
+                @click.stop="changeImg(index)">
+                <img :src="img" @load="loadImage">
             </div>
         </div>
     </div>

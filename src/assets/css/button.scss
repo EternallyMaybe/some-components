@@ -1,0 +1,132 @@
+.black-empty-button,
+.black-full-button,
+.blue-empty-button,
+.blue-full-button,
+.green-empty-button,
+.green-full-button,
+.grey-empty-button,
+.grey-full-button,
+.orange-empty-button,
+.orange-full-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    height: 30px;
+    font-size: 13px;
+    letter-spacing: .7px;
+    color: #fff;
+    cursor: pointer
+}
+
+a, button, div, label, span {
+    .green-full-button {
+        background-color: #85c807;
+        &:hover {
+            background-color: #9eda34;
+        }
+        &:active {
+            background-color: 7cb615;
+        }
+    
+    }
+    
+    .green-empty-button {
+        color: #8cca17;
+        border: 1px solid #8cca17;
+        background-color: transparent;
+        &:hover {
+            background-color: #f0fdd8
+        }
+        &:active {
+            background-color: #def3b8
+        }
+    
+    }
+    
+    
+    .blue-full-button {
+        background-color: #00a7ec;
+        &:hover {
+            background-color: #4fb3f4;
+        }
+        &:active {
+            background-color: #2f97db;
+        }
+    
+    }
+    
+    .blue-empty-button {
+        color: #00a7ec;
+        border: 1px solid #00a7ec;
+        &:hover {
+            background-color: #ebf7ff;
+        }
+        &:active {
+            background-color: #dbecf8;
+        }
+    
+    }
+    
+    .orange-full-button {
+        background-color: #f90;
+        &:hover {
+            background-color: #ffad31;
+        }
+        &:active {
+            background-color: #e18700;
+        }
+    
+    }
+    
+    .orange-empty-button {
+        color: #f90;
+        border: 1px solid #f90;
+        &:hover {
+            background-color: #ffad31;
+        }
+        &:active {
+            background-color: #e18700;
+        }
+    
+    }
+    
+    .black-full-button {
+        background-color: #363636;
+        &:hover {
+            background-color: #474747;
+        }
+        &:active {
+            background-color: #1f1f1f;
+        }
+    
+    }
+    
+    .black-empty-button {
+        border: 1px solid #cbcbcb;
+        color: #666;
+        background-color: #fff;
+        &:hover {
+            border: 1px solid #999;
+            color: #333;
+        }
+        &:active {
+            border: 1px solid #999;
+            color: #333;
+            background-color: #f0f0f0;
+        }
+    
+    }
+    
+    .grey-full-button {
+        background-color: #999;
+        cursor: default
+    }
+    .grey-empty-button {
+        border: 1px solid #e5e5e5;
+        color: #999;
+        cursor: default
+    }
+}
