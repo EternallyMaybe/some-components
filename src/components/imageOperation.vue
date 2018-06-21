@@ -38,7 +38,7 @@
             images: Array,
             selected: Number
         },
-        data: function () {
+        data() {
             return {
                 rotate: 0,
                 formatImages: this.dealData(this.images),
@@ -49,23 +49,23 @@
             }
         },
         methods: {
-            dealData: function (data) {
+            dealData(data) {
                 return data.map((item) => data.replace(/(https?:)?\/\//, "http://"));
             },
-            pickup: function () {
+            pickup() {
                 this.$emit("pickup")
             },
-            viewOriginal: function () {
+            viewOriginal() {
 
             },
-            turn: function (deg) {
+            turn(deg) {
                 var direction = deg > 0 ? 1 : -1,
                     rotate = this.rotate + deg === 360 * direction ? 0 : this.rotate + deg;
-                this.isLimit = rotate % 180 != 0,
-                    this.rotate = rotate,
-                    this.setImageStyle(this.isLimit)
+                this.isLimit = rotate % 180 != 0;
+                this.rotate = rotate;
+                this.setImageStyle(this.isLimit);
             },
-            setImageStyle: function (t) {
+            setImageStyle(limit) {
                 let image = this.$refs.image,
                     height = image.clientHeight,
                     width = image.clientWidth,
@@ -75,18 +75,18 @@
                     width = height / radio;
                 }
                 this.areaHeight = limit ? width + "px" : "auto",
-                    this.marginTop = limit ? (width - height) / 2 : 0
+                this.marginTop = limit ? (width - height) / 2 : 0
             },
-            loadImage: function (event) {
+            loadImage(event) {
                 let target = event.target;
                 target.className = target.naturalHeight / target.naturalWidth > 1 ? "fixed-width" : "fixed-height"
             },
-            changeImg: function (index) {
-                this.rotate = 0,
-                    this.isLimit = false,
-                    this.marginTop = 0,
-                    this.areaHeight = "auto",
-                    this.currentIndex = index
+            changeImg(index) {
+                this.rotate = 0;
+                this.isLimit = false;
+                this.marginTop = 0;
+                this.areaHeight = "auto";
+                this.currentIndex = index;
             }
         }
     }

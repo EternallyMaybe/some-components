@@ -13,7 +13,7 @@
 </template>
 <script>
     export default {
-        data: function() {
+        data() {
             return {
                 items: [],
                 activeIndex: 0,
@@ -21,46 +21,54 @@
             }
         },
         methods: {
-            setActiveItem: function(t) {
+            setActiveItem(activeIndex) {
                 this.clear();
-                var e = t;
-                e < 0 ? e = this.items.length - 1 : t > this.items.length - 1 && (e = 0),
-                this.items[e].active = !0,
-                this.setSideActive(e),
-                this.activeIndex = e
+                let realIndex = activeIndex;
+                if (realIndex < 0) {
+                    realIndex = this.items.length - 1; 
+                } else if (activeIndex > this.items.length - 1) {
+                    realIndex = 0;
+                }
+                this.items[realIndex].active = false;
+                this.setSideActive(realIndex);
+                this.activeIndex = realIndex;
             },
-            setSideActive: function(t) {
-                0 === t ? this.setValue(this.items.length - 1, 1) : t === this.items.length - 1 ? this.setValue(t - 1, 0) : this.setValue(t - 1, t + 1)
+            setSideActive(activeIndex) {
+                if (0 === activeIndex) {
+                    this.setValue(this.items.length - 1, 1);
+                } else if (activeIndex === this.items.length - 1) {
+                    this.setValue(activeIndex - 1, 0);
+                } else {
+                    this.setValue(activeIndex - 1, activeIndex + 1);
+                }
             },
-            setValue: function(t, e) {
-                this.items[e].activeRight = !0,
-                this.items[t].activeLeft = !0
+            setValue(activeLeftIndex, activeRightIndex) {
+                this.items[activeLeftIndex].activeRight = true;
+                this.items[activeRightIndex].activeLeft = true;
             },
-            clear: function() {
-                this.items.forEach(function(t) {
-                    t.active = !1,
-                    t.activeLeft = !1,
-                    t.activeRight = !1
+            clear() {
+                this.items.forEach(function(item) {
+                    item.active = false;
+                    item.activeLeft = false;
+                    item.activeRight = false;
                 })
             },
-            autoPlay: function() {
-                var t = this;
+            autoPlay() {
                 clearInterval(this.timer),
                 this.timer = setInterval(function() {
-                    t.setActiveItem(t.activeIndex + 1)
-                }, 5e3)
+                    this.setActiveItem(t.activeIndex + 1)
+                }, 5000)
             },
-            onMouseEnter: function() {
+            onMouseEnter() {
                 clearInterval(this.timer)
             }
         },
         mounted: function() {
-            var t = this;
             this.$nextTick(function() {
-                t.items = t.$children,
-                t.items[0].active = !0,
-                t.setValue(t.items.length - 1, 1),
-                t.autoPlay()
+                this.items = this.$children,
+                this.items[0].active = !0,
+                this.setValue(this.items.length - 1, 1),
+                this.autoPlay()
             })
         }
     }

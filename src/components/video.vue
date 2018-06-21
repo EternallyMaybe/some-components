@@ -74,11 +74,13 @@
                 default: .5
             }
         },
-        data: function () {
+        data() {
             return {
-                fullScreen: !1,
-                play: !1,
-                stopLock: !1,
+                // 全屏数据
+                fullScreen: false,
+                // 视频数据
+                play: false,
+                stopLock: false,
                 duration: 0,
                 videoValue: 0,
                 currentTime: "00:00",
@@ -86,155 +88,196 @@
                 videoBackgroundSize: "0% 100%",
                 clickCount: 0,
                 timer: null,
-                volume: !0,
+                // 音量控制数据
+                volume: true,
                 volumeValue: .5,
                 tempVolumeValue: .5,
-                showVolumeProgress: !1,
+                showVolumeProgress: false,
                 volumeBackgroundSize: "50% 100%",
-                showControls: !0,
+                // 展示控制条
+                showControls: true,
+                // 定时器
                 timeoutId: "",
-                endState: !1,
-                showMask: !1,
+                // 遮罩数据
+                endState: false,
+                showMask: false,
                 bufferpercentage: 0,
+                // 鼠标移动前位置
                 mousePosition: {
                     clientX: 0,
                     clientY: 0
                 }
             }
         },
-        computed: a()({}, i.i(s.a)(["scrollTop"])),
+        computed: {
+            scrollTop() {
+                return document.querySelector(".main").scrollTop;
+            }
+        },
         watch: {
-            volumeProps: function (t) {
-                this.volumeValue = t
+            volumeProps(val) {
+                this.volumeValue = val;
             },
-            play: function (t) {
-                this.endState = !1,
-                    t ? (this.$refs.video.play(),
-                        this.showMask = !1) : (this.$refs.video.pause(),
-                        this.alwaysShow(),
-                        this.stopLock || (this.showMask = !0))
+            play(val) {
+                this.endState = false;
+                if (val) {
+                    this.$refs.video.play();
+                    this.showMask = false;
+                } else {
+                    this.$refs.video.pause();
+                    this.alwaysShow();
+                    this.stopLock || (this.showMask = true);
+                }
             },
-            fullScreen: function (t) {
-                var e = this;
-                t ? this.$refs.video.webkitRequestFullScreen() : (setTimeout(function () {
-                        document.querySelector(".main").scrollTop = e.scrollTop
+            fullScreen(val) {
+                if (val) {
+                    this.$refs.video.webkitRequestFullScreen();
+                } else {
+                    setTimeout(function () {
+                        document.querySelector(".main").scrollTop = this.scrollTop
                     }, 50),
-                    this.$refs.video.webkitExitFullScreen())
+                    this.$refs.video.webkitExitFullScreen()
+                }
             },
-            videoValue: function (t) {
-                var e = (t / this.duration).toFixed(20);
-                this.videoBackgroundSize = 100 * e + .2 + "% 100%"
+            videoValue(val) {
+                var percentage = (val / this.duration).toFixed(20);
+                this.videoBackgroundSize = 100 * percentage + .2 + "% 100%"
             },
-            volumeValue: function (t) {
-                this.volumeBackgroundSize = 100 * t + "% 100%",
-                    this.$refs.video.volume = t,
-                    this.volume = 0 != t,
-                    sessionStorage.setItem("volume", t)
+            volumeValue(val) {
+                this.volumeBackgroundSize = 100 * val + "% 100%";
+                this.$refs.video.volume = val;
+                this.volume = 0 != val;
+                sessionStorage.setItem("volume", val);
             }
         },
         methods: {
-            getTime: function (t) {
-                this.duration = t.target.duration,
-                    this.totalTime = this.dealSeconds(this.duration)
+            // 获取视频时间
+            getTime(e) {
+                this.duration = e.target.duration,
+                this.totalTime = this.dealSeconds(this.duration)
             },
-            timeUpdate: function (t) {
-                if (!this.stopLock) {
-                    var e = t.target.currentTime,
-                        i = e && void 0 !== e ? e : 0;
-                    this.videoValue = i,
-                        this.currentTime = this.dealSeconds(i)
-                }
+            // 获取播放进度
+            timeUpdate(e) {
+                // 当鼠标点击时进行锁定，避免视频一直播放，因而导致对视频的重新赋值不准的情况
+                if (this.stopLock) return;
+                // 更新进度条样式
+                let time = e.target.currentTime,
+                    currentTime = time && void 0 !== time ? time : 0;
+                this.videoValue = currentTime;
+                this.currentTime = this.dealSeconds(currentTime);
             },
-            endHandle: function (t) {
-                var e = this;
-                this.play = !1,
-                    this.$nextTick(function () {
-                        e.endState = !0,
-                            e.$emit("endHandle", t)
-                    })
-            },
-            mousedownHandle: function () {
-                this.stopLock = !0,
-                    this.play = !1
-            },
-            mouseupHandle: function () {
-                this.$refs.video.currentTime = this.videoValue,
-                    this.play = !0,
-                    this.stopLock = !1
-            },
-            dealSeconds: function (t) {
-                var e = parseInt(t, 10),
-                    i = parseInt(t / 60, 10) % 60,
-                    n = i >= 10 ? i : "0" + i,
-                    a = e % 60;
-                return n + ":" + (a >= 10 ? a : "0" + a)
-            },
-            clickVideo: function (t) {
-                var e = this;
-                0 === t.button && (this.clickCount++,
-                    1 === this.clickCount ? this.timer = setTimeout(function () {
-                        e.play = !e.play,
-                            e.clickCount = 0,
-                            e.$emit("clearTimer")
-                    }, 300) : (this.fullScreen = !this.fullScreen,
-                        clearTimeout(this.timer),
-                        this.clickCount = 0))
-            },
-            handleVolume: function () {
-                this.volume ? (this.volume = !1,
-                    this.tempVolumeValue = this.volumeValue,
-                    this.volumeValue = 0,
-                    this.$refs.video.volume = 0) : (this.volume = !0,
-                    this.volumeValue = this.tempVolumeValue,
-                    this.$refs.video.volume = this.volumeValue)
-            },
-            handleVolumeShow: function (t) {
-                t.offsetY > 2 && (this.showVolumeProgress = !1)
-            },
-            handleControls: function () {
-                var t = this;
-                clearTimeout(this.timeoutId),
-                    this.showControls = !0,
-                    this.timeoutId = setTimeout(function () {
-                        t.showControls = !1
-                    }, 2e3)
-            },
-            alwaysShow: function () {
-                clearTimeout(this.timeoutId),
-                    this.showControls = !0
-            },
-            leaveVideo: function () {
-                this.play && (this.showControls = !1)
-            },
-            leaveControls: function (t) {
-                t.offsetY > 0 && this.leaveVideo()
-            },
-            playVideo: function () {
-                var t = this;
+            // 媒介已到达结尾时触发
+            endHandle(e) {
+                this.play = false;
+                // 控制条渲染完再设置状态
                 this.$nextTick(function () {
-                    t.play = !0
+                    this.endState = true;
+                    this.$emit("endHandle", e);
                 })
             },
-            stopVideo: function () {
-                var t = this;
+            // 鼠标按下range时停止视频播放，同时对视频加锁
+            mousedownHandle() {
+                this.stopLock = true;
+                this.play = false;
+            },
+            // 鼠标移除range时触发视频播放，同时取消锁定
+            mouseupHandle() {
+                this.$refs.video.currentTime = this.videoValue;
+                this.play = true;
+                this.stopLock = false;
+            },
+            dealSeconds(seconds) {
+                var secondsInt = parseInt(seconds, 10),
+                    minutes = parseInt(seconds / 60, 10) % 60,
+                    minutesStr = minutes >= 10 ? minutes : "0" + minutes,
+                    secondsTemp = secondsInt % 60;
+                return minutesStr + ":" + (secondsTemp >= 10 ? secondsTemp : "0" + secondsTemp)
+            },
+            // 双击全屏
+            clickVideo(e) {
+                if (0 !== e.button) return;
+                this.clickCount++;
+                if (1 === this.clickCount) {
+                    this.timer = setTimeout(function () {
+                        this.play = !this.play;
+                        this.clickCount = 0;
+                        this.$emit("clearTimer");
+                    }, 300) 
+                } else {
+                    this.fullScreen = !this.fullScreen;
+                    clearTimeout(this.timer);
+                    this.clickCount = 0;
+                }
+            },
+            // 操作声音控制条
+            handleVolume() {
+                if (this.volume) {
+                    this.volume = false;
+                    this.tempVolumeValue = this.volumeValue;
+                    this.volumeValue = 0;
+                    this.$refs.video.volume = 0;
+                } else {
+                    this.volume = true;
+                    this.volumeValue = this.tempVolumeValue;
+                    this.$refs.video.volume = this.volumeValue;
+                }
+            },
+            handleVolumeShow(e) {
+                if (e.offsetY > 2) {
+                    this.showVolumeProgress = false;
+                }
+            },
+            // 控制条的展示
+            handleControls() {
+                let self = this;
+                clearTimeout(this.timeoutId);
+                this.showControls = true;
+                this.timeoutId = setTimeout(() => {
+                    self.showControls = false;
+                }, 2000);
+            },
+            alwaysShow() {
+                clearTimeout(this.timeoutId);
+                this.showControls = true;
+            },
+            leaveVideo() {
+                if (this.play) {
+                    this.showControls = false
+                };
+            },
+            leaveControls(e) {
+                if (e.offsetY > 0) {
+                    this.leaveVideo();
+                }
+            },
+            playVideo() {
                 this.$nextTick(function () {
-                    t.play = !1
+                    this.play = true;
+                })
+            },
+            stopVideo() {
+                this.$nextTick(function () {
+                    this.play = false;
                 })
             }
         },
         mounted: function () {
-            var t = this,
-                e = this.$refs.video;
-            e.volume = .5,
+            let self = this,
+                video = this.$refs.video;
+            video.volume = .5;
+            // 控制条2s消失
             this.timeoutId = setTimeout(function () {
-                t.showControls = !1
-            }, 2e3),
+                self.showControls = false;
+            }, 2000),
+            // 监听ESC退出事件
             document.addEventListener("webkitfullscreenchange", function () {
-                null == document.webkitFullscreenElement && t.fullScreen && (t.fullScreen = !t.fullScreen)
+                if (null == document.webkitFullscreenElement && t.fullScreen) {
+                    self.fullScreen = !self.fullScreen;
+                }
             }),
             e.onprogress = function () {
-                var i = e.buffered.length ? e.buffered.end(e.buffered.length - 1) / e.duration : 0;
-                t.bufferpercentage = 100 * i.toFixed(20)
+                let percentage = video.buffered.length ? video.buffered.end(video.buffered.length - 1) / video.duration : 0;
+                self.bufferpercentage = 100 * percentage.toFixed(20)
             }
         }
     }

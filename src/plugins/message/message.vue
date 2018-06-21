@@ -20,7 +20,7 @@
 </template>
 <script>
     export default {
-        data: function () {
+        data() {
             return {
                 show: false,
                 title: "提示",
@@ -34,8 +34,8 @@
         },
         methods: {
             handle: function (type) {
-                this.hideMessage(),
-                    "confirm" === type ? this.resolve() : this.reject()
+                this.hideMessage();
+                "confirm" === type ? this.resolve() : this.reject()
             },
             showMessage: function () {
                 this.show = true;

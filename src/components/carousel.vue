@@ -33,24 +33,6 @@
 </template>
 <script>
     export default {
-        data: function () {
-            return {
-                totalLength: 0,
-                panelWidth: 0,
-                arrowShow: !1,
-                currentIndex: 0,
-                largeCurrentIndex: 0,
-                intervalId: 0,
-                timeoutId: 0,
-                indicator: !0,
-                carouselItemWidth: 0,
-                width: 0,
-                startOffset: 0,
-                endOffset: 0,
-                sideWidth: 0,
-                operations: []
-            }
-        },
         props: {
             move: {
                 type: String,
@@ -62,7 +44,7 @@
             },
             animated: {
                 type: Boolean,
-                default: !1
+                default: false
             },
             interval: {
                 type: String,
@@ -70,145 +52,213 @@
             },
             stopInterval: {
                 type: Boolean,
-                default: !1
+                default: false
             },
             showIndicator: {
                 type: Boolean,
-                default: !0
+                default: true
             }
         },
-        mounted: function () {
-            var t = this;
-            this.initData(),
-                this.setOffset(),
-                this.slide = i.i(a.a)(function (e) {
-                    t.iconMove(e),
-                        t.itemMove(e * t.carouselItemWidth * -1)
-                }, 300),
-                this.indicatorHover = i.i(a.a)(function (e) {
-                    t.indicatorEvent(e)
-                }, 200)
-        },
-        beforeDestroy: function () {
-            this.clear()
+        data() {
+            return {
+                totalLength: 0,
+                // 面板宽度
+                panelWidth: 0,
+                // 左右按钮显示
+                arrowShow: false,
+                // 当前小图下标
+                currentIndex: 0,
+                // 当前大图下标
+                largeCurrentIndex: 0,
+                // 定时器ID
+                intervalId: 0,
+                timeoutId: 0,
+                // 是否展示小图标
+                indicator: false,
+                // item宽度
+                carouselItemWidth: 0,
+                // 页面宽度
+                width: 0,
+                // item偏移
+                startOffset: 0,
+                endOffset: 0,
+                // 两侧宽度
+                sideWidth: 0,
+                // 操作数组
+                operations: []
+            }
         },
         methods: {
-            initData: function () {
-                var t = getComputedStyle(this.$refs.carousel),
-                    e = this.$refs.panel.children;
-                this.indicator = this.showIndicator,
-                    this.totalLength = "common" === this.type ? 2 * e.length : e.length,
-                    this.largeCurrentIndex = this.totalLength / 2,
-                    this.width = parseInt(t.width, 10),
-                    this.carouselItemWidth = parseInt(this.move, 10),
-                    this.sideWidth = parseInt((this.width - this.carouselItemWidth) / 2, 10),
-                    this.panelWidth = e.length * this.carouselItemWidth,
-                    this.startOffset = this.sideWidth
+            initData() {
+                var carouselStyle = getComputedStyle(this.$refs.carousel),
+                    children = this.$refs.panel.children;
+                // 设置小图展示
+                this.indicator = this.showIndicator;
+                // 重置数量
+                this.totalLength = "common" === this.type ? 2 * children.length : children.length;
+                // 设置初始图片下标
+                this.largeCurrentIndex = this.totalLength / 2;
+                // 容器宽度
+                this.width = parseInt(carouselStyle.width, 10);
+                // item宽度，移动距离
+                this.carouselItemWidth = parseInt(this.move, 10);
+                // 图片两侧宽度
+                this.sideWidth = parseInt((this.width - this.carouselItemWidth) / 2, 10);
+                // panel宽度
+                this.panelWidth = children.length * this.carouselItemWidth;
+                // 初始化偏移
+                this.startOffset = this.sideWidth;
             },
-            setOffset: function () {
+            // 设置偏移值
+            setOffset() {
                 var t = this;
                 this.totalLength / 2 > 1 ? "seamless" === this.type ? (this.startOffset = (this.totalLength / 2 - 1) *
                         this.carouselItemWidth * -1 - (this.carouselItemWidth - this.startOffset),
                         this.endOffset = this.carouselItemWidth * (this.totalLength - 1) - Math.abs(this.startOffset)
                     ) : "common" === this.type && (this.startOffset = -1 * this.carouselItemWidth,
-                        this.endOffset = this.carouselItemWidth * (this.totalLength / 2 - 2)) : this.indicator = !1,
-                    this.$nextTick(function () {
-                        t.initTranslateX(),
-                            "common" === t.type && t.itemMove(t.carouselItemWidth, "initial-offset")
-                    })
+                        this.endOffset = this.carouselItemWidth * (this.totalLength / 2 - 2)) : this.indicator = !1;
+                this.$nextTick(function () {
+                    t.initTranslateX(),
+                        "common" === t.type && t.itemMove(t.carouselItemWidth, "initial-offset")
+                })
             },
-            handleButtonEnter: function () {
-                this.totalLength <= 2 || (this.arrowShow = !0,
-                    this.clear())
+            // 按钮显示、隐藏判断
+            handleButtonEnter() {
+                if (this.totalLength <= 2) return;
+                this.arrowShow = true;
+                this.clear();
             },
-            handleButtonLeave: function () {
-                var t = this;
-                this.arrowShow = !1,
-                    this.clear(),
-                    this.timeoutId = setTimeout(function () {
-                        t.$refs.panel.children.length > 1 && t.setInterval()
-                    }, 5e3)
+            handleButtonLeave() {
+                this.arrowShow = false;
+                this.clear();
+                this.timeoutId = setTimeout(function () {
+                    this.$refs.panel.children.length > 1 && this.setInterval()
+                }, 5000)
             },
-            initTranslateX: function () {
-                var t = this,
-                    e = this.$refs.panel.children,
-                    i = this.startOffset;
-                Array.prototype.forEach.call(e, function (e) {
-                        t.setAnimation(e, i),
-                            i += t.carouselItemWidth
-                    }),
-                    e.length > 1 && (this.clear(),
-                        this.setInterval())
-            },
-            itemMove: function (t, e) {
-                var i = this,
-                    a = this.$refs.panel.children,
-                    n = t > 0 ? -1 : 1;
-                this.largeCurrentIndex + n > this.totalLength - 1 ? this.largeCurrentIndex = 0 : this.largeCurrentIndex +
-                    n < 0 ? this.largeCurrentIndex = this.totalLength - 1 : this.largeCurrentIndex += n,
-                    Array.prototype.forEach.call(a, function (a, s) {
-                        var o = a.style.transform,
-                            r = "" === o ? t : parseInt(o.split("translateX(")[1], 10) + t,
-                            c = e ? a.className : a.className.replace(
-                                /\s*(no-transition|is-active|animated|initial)/gi, "");
-                        r > i.endOffset ? (r = i.startOffset,
-                                c += " no-transition") : r < i.startOffset && (r = i.endOffset,
-                                c += " no-transition"),
-                            s === i.largeCurrentIndex && (c += " is-active"),
-                            c += i.animated ? " animated" : "",
-                            a.className = c,
-                            i.setAnimation(a, r, n)
-                    })
-            },
-            iconMove: function (t) {
-                0 === this.currentIndex && t < 0 ? this.currentIndex = this.totalLength / 2 : this.currentIndex ===
-                    this.totalLength / 2 - 1 && t > 0 && (this.currentIndex = -1),
-                    this.currentIndex = this.currentIndex + t
-            },
-            setAnimation: function (t, e, i) {
-                var a = "translateX(" + e + "px)",
-                    n = this.sideWidth - this.carouselItemWidth,
-                    s = this.sideWidth + this.carouselItemWidth,
-                    o = "";
-                this.animated && (e < this.sideWidth && (o = "right"),
-                        e > this.sideWidth && (o = "left"),
-                        e === n && (a += " scale(0.9)"),
-                        e === s && (a += " scale(0.9)"),
-                        e === this.sideWidth && (o = i > 0 ? "left" : "right")),
-                    t.style.transformOrigin = o,
-                    t.style.transform = a
-            },
-            setInterval: function (t) {
-                function e() {
-                    return t.apply(this, arguments)
+            // 设置translateX初始值
+            initTranslateX() {
+                var children = this.$refs.panel.children,
+                    translate = this.startOffset;
+                Array.prototype.forEach.call(children, function (item) {
+                    this.setAnimation(item, translate),
+                    translate += this.carouselItemWidth
+                });
+                if (children.length > 1) {
+                    this.clear();
+                    this.setInterval();
                 }
-                return e.toString = function () {
-                        return t.toString()
-                    },
-                    e
-            }(function () {
-                var t = this;
-                this.stopInterval || (this.intervalId = setInterval(function () {
-                    t.slide(1)
-                }, this.interval))
-            }),
-            clear: function () {
+            },
+            // 移动图片
+            itemMove(val, type) {
+                var children = this.$refs.panel.children,
+                    direction = t > 0 ? -1 : 1;
+
+                if (this.largeCurrentIndex + direction > this.totalLength - 1) {
+                    this.largeCurrentIndex = 0;
+                } else if (this.largeCurrentIndex + direction < 0) {
+                    this.largeCurrentIndex = this.totalLength - 1;
+                }　else {
+                    this.largeCurrentIndex += direction;
+                }
+
+                Array.prototype.forEach.call(children, function (item, index) {
+                    var transform = item.style.transform,
+                        translate = "" === transform ? val : parseInt(transform.split("translateX(")[1], 10) + val,
+                        className = type ? item.className : item.className.replace(/\s*(no-transition|is-active|animated|initial)/gi, "");
+                    if (translate > this.endOffset) {
+                        translate = this.startOffset;
+                        className += " no-transition";
+                    } else if (translate < this.startOffset) {
+                        translate = this.endOffset;
+                        className += " no-transition";
+                    }
+                    if (index === this.largeCurrentIndex) {
+                        className += " is-active";
+                    }
+
+                    className += this.animated ? " animated" : "",
+                    item.className = className,
+                    this.setAnimation(item, translate, direction)
+                });
+            },
+            iconMove(val) {
+                if (0 === this.currentIndex && val < 0) {
+                    this.currentIndex = this.totalLength / 2;
+                } else if (this.currentIndex === this.totalLength / 2 - 1 && val > 0 ) {
+                    this.currentIndex = -1;
+                }
+                this.currentIndex = this.currentIndex + val;
+            },
+            // 设置动画效果
+            setAnimation(el, translate, direction) {
+                var transform = "translateX(" + translate + "px)",
+                    leftTranslate = this.sideWidth - this.carouselItemWidth,
+                    rightTranslate = this.sideWidth + this.carouselItemWidth,
+                    origin = "";
+                if (this.animated) {
+                    if (translate < this.sideWidth)　{
+                        origin = "right";
+                    } 
+                    if (translate > this.sideWidth)　{
+                        origin = "left";
+                    } 
+                    if ( translate === leftTranslate || translate === rightTranslate)　{
+                        transform += " scale(0.9)";
+                    } 
+                    if (translate === this.sideWidth)　{
+                        origin = direction > 0 ? "left" : "right"
+                    } 
+                } 
+                el.style.transformOrigin = origin;
+                el.style.transform = transform;
+            },
+            // 设置定时播放
+            setInterval(t) {
+                if (!this.stopInterval) {
+                    this.intervalId = setInterval(function () {
+                        t.slide(1)
+                    }, this.interval)
+                }
+            },
+            clear() {
                 clearTimeout(this.timeoutId),
-                    clearInterval(this.intervalId)
+                clearInterval(this.intervalId)
             },
-            indicatorEvent: function (t) {
-                var e = 1,
-                    i = void 0;
-                for (t < this.currentIndex && (e = -1),
-                    i = 0; i < Math.abs(t - this.currentIndex); i++)
-                    this.itemMove(e * this.carouselItemWidth * -1);
-                this.currentIndex = t
+            // 小图标事件
+            indicatorEvent(index) {
+                var direction = index < this.currentIndex ? -1 : 1,
+                    i = 0;
+                for (i; i < Math.abs(index - this.currentIndex); i++)
+                    this.itemMove(direction * this.carouselItemWidth * -1);
+                this.currentIndex = index;
             },
-            clickMoveItem: function (t) {
-                t > this.largeCurrentIndex || 0 === t && this.largeCurrentIndex === this.totalLength - 1 ? t ===
-                    this.totalLength - 1 && 0 === this.largeCurrentIndex ? this.slide(-1) : this.slide(1) : t <
-                    this.largeCurrentIndex && this.slide(-1)
+            // 点击移动图片事件
+            clickMoveItem(index) {
+                if (index > this.largeCurrentIndex || 0 === index && this.largeCurrentIndex === this.totalLength - 1) {
+                    if (index === this.totalLength - 1 && 0 === this.largeCurrentIndex) {
+                        this.slide(-1);
+                    } else {
+                        this.slide(1);
+                    }
+                } else if (index < this.largeCurrentIndex) {
+                    this.slide(-1);
+                }
+                
             }
+        },
+         mounted: function () {
+            this.initData(),
+                this.setOffset(),
+                this.slide = throttle((val) => {
+                    this.iconMove(val),
+                    this.itemMove(val * this.carouselItemWidth * -1)
+                }, 300),
+                this.indicatorHover = throttle((index) => {
+                    this.indicatorEvent(index)
+                }, 200)
+        },
+        beforeDestroy: function () {
+            this.clear()
         }
     }
 </script>
