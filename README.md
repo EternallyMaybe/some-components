@@ -1,1 +1,11 @@
-### webpack简单版
+### 封装的一些插件
+#### jQuery文件夹（art-template模板结合jQuery）
+* dropdown，下拉列表插件
+* imagePagation，仿百度图片查看图片时的图片列表分页
+* pagination，分页插件
+* jQuery.scroll，支持子元素scroll父元素容器不跟随滚动
+#### src/components文件夹（vue组件）
+* carousel，轮播插件
+* gallery，3d轮播插件
+* imageOperation，图片操作插件
+* video，重写H5视频样式
