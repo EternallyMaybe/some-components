@@ -5,7 +5,9 @@ function Pagination() {
 
 Pagination.prototype.init = function(options) {
     var _default = {
-        mount: "#Pagination"
+        mount: "#Pagination",
+        current: 0,
+        totalPage: 0
     };
     this.options = Object.assign({}, _default, options);
 };
@@ -24,8 +26,8 @@ Pagination.prototype.render = function(currentPage, totalPage) {
     this.bindEvent()
 };
 
-Pagination.prototype.pageChange = function(t) {
-    this.options.current = t,
+Pagination.prototype.pageChange = function(page) {
+    this.options.current = page,
     this.render(this.options.current, this.options.totalPage),
     this.options.callback(this.options.current)
 };
@@ -35,10 +37,9 @@ Pagination.prototype.bindEvent = function() {
         $pre = $(".page-prev"),
         $next = $(".page-next"),
         $item = $(".page-item").not(".disabled");
-        $pre = $(".page-prev"),
-    n.off("click").on({
+    $pre.off("click").on({
         click: function() {
-            this.options.current > 1 && self.pageChange(self.options.current - 1)
+            self.options.current > 1 && self.pageChange(self.options.current - 1)
         }
     });
     $next.off("click").on({

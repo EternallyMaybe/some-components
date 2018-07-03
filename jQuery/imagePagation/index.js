@@ -1,9 +1,20 @@
 var render = require('./imagePagation.art');
 
+/*
+ * @des 仿百度图片查看图片时的图片列表分页 
+ * @params options 配置参数
+ * @params list 获取到的图片列表
+ * @params inited 是否已经初始化
+ * @params startIndex 获取到的图片列表的开始下标
+ * @params endIndex 获取到的图片列表的结束下标
+ * @params showImages 展示图片的起止下标
+ * @params slideThrottle 点击图片时的滚动函数
+ * @params turnPageThrottle 列表翻页时的函数
+ */
 function ImagePagation() {
     this.options = {},
     this.list = [],
-    this.inited = !0,
+    this.inited = true,
     this.startIndex = 0,
     this.endIndex = 0,
     this.showImages = {
@@ -12,40 +23,47 @@ function ImagePagation() {
     };
     var self = this;
     this.slideThrottle = throttle((id) => {
-        self.slide(e)
-    }, 450),
+        self.slide(id)
+    }, 450);
     this.turnPageThrottle = throttle((direction, num) =>{
-        self.turnPage(e, n)
-    }, 450)
+        self.turnPage(direction, num)
+    }, 450);
 }
-
+// 初始数据
 ImagePagation.prototype.init = function(options) {
-    options.activeIndex = parseInt(options.activeIndex, 10),
-    this.currentPage = Math.ceil((options.activeIndex + 1) / options.pageSize),
-    this.startIndex = (this.currentPage - 1) * options.pageSize,
-    this.endIndex = this.currentPage * options.pageSize,
-    this.options = Object.assign({}, options),
-    this.render(),
-    this.bindPageEvent()
-}
+    var _default = {
+        mount: "#imagePagation",
+        activeIndex: 0,
+        pageSize: 20
+    }
 
+    options.activeIndex = parseInt(options.activeIndex, 10);
+    // 选中图片所对应的页码
+    this.currentPage = Math.ceil((options.activeIndex + 1) / options.pageSize);
+    this.startIndex = (this.currentPage - 1) * options.pageSize;
+    this.endIndex = this.currentPage * options.pageSize;
+    this.options = Object.assign({}, _default, options);
+    this.render();
+    this.bindPageEvent();
+}
+// 初始渲染
 ImagePagation.prototype.render = function() {
     var direction = this.getDirection(this.options.activeIndex, 3);
-    $(this.options.mount).html(render()),
-    this.getList(this.currentPage, this.options.pageSize, 1),
-    0 !== direction && this.startIndex > 0 && this.getList(this.currentPage + direction, this.options.pageSize, direction),
-    this.initViewArea(),
-    this.renderList(direction, 7),
-    this.bindItemEvent()
+    $(this.options.mount).html(render());
+    this.getList(this.currentPage, this.options.pageSize, 1);
+    0 !== direction && this.startIndex > 0 && this.getList(this.currentPage + direction, this.options.pageSize, direction);
+    this.initViewArea();
+    this.renderList(direction, 7);
+    this.bindItemEvent();
 }
-
+// 初始展示图片的下标
 ImagePagation.prototype.initViewArea = function() {
     var startIndex = this.options.activeIndex - 3,
         endIndex = this.options.activeIndex + 3;
-    if (this.options.activeIndex - 3 < 0) {
+    if (startIndex < 0) {
         startIndex = 0;
         endIndex = this.total > 6 ? 6 : this.total;
-    } else if (this.options.activeIndex + 3 >= this.total) {
+    } else if (endIndex >= this.total) {
         startIndex = this.total > 6 ? this.total - 7 : 0;
         endIndex = this.total - 1;
     }
@@ -59,14 +77,14 @@ ImagePagation.prototype.getDirection = function(activeIndex, num) {
     return activeIndex - num < this.startIndex ? -1 : activeIndex + num > this.endIndex ? 1 : 0
 }
 
-
+// 获取数据
 ImagePagation.prototype.getList = function(page, pageSize, direction) {
     var self = this;
     $.ajax({
         url: '',
         type: "get",
         dataType: "json",
-        async: !1,
+        async: false,
         success: function(res) {
             var data = res.Message.data,
                 total = res.Message.total;
@@ -82,7 +100,7 @@ ImagePagation.prototype.getList = function(page, pageSize, direction) {
         }
     })
 }
-
+// 数据渲染
 ImagePagation.prototype.renderList = function(direction, num) {
     var $panel = $(".image-pagation .panel"),
         indexArr = this.getStartIndex(direction, num),
@@ -94,7 +112,10 @@ ImagePagation.prototype.renderList = function(direction, num) {
     direction > 0 ? $panel.append(i) : $panel.prepend(i),
     this.setActive(this.options.activeId)
 }
-
+/*
+ * @des 获取开始下标
+ * @return  index：对应已获取数据的下标  realIndex：对应所有数据的下标
+ */
 ImagePagation.prototype.getStartIndex = function(direction, num) {
     var index = direction > 0 ? this.showImages.endIndex + 1 : this.showImages.startIndex - num,
         realIndex = 0;
@@ -108,7 +129,7 @@ ImagePagation.prototype.getStartIndex = function(direction, num) {
     }
     return [index, realIndex]
 }
-
+// 图片移动
 ImagePagation.prototype.translate = function(direction, num) {
     var self = this
         $panel = $(".image-pagation .panel")
@@ -125,14 +146,14 @@ ImagePagation.prototype.translate = function(direction, num) {
         self.bindItemEvent()
     })
 }
-
+// 设置激活样式
 ImagePagation.prototype.setActive = function(id) {
     var $item = $(".panel .image-item"),
         $activeItem = $(".panel div[data-resourceId=" + id + "]");
     $item.removeClass("active"),
     $activeItem.addClass("active")
 }
-
+// 删除指定数量的元素
 ImagePagation.prototype.deleteByNum = function(direction, num) {
     var $item = $(".panel .image-item"),
         i = direction > 0 ? $item.length - num : 0,
@@ -141,12 +162,12 @@ ImagePagation.prototype.deleteByNum = function(direction, num) {
         $item[i].remove()
     }
 }
-
+// 设置展示图片的起始下标
 ImagePagation.prototype.setImagesIndex = function(num) {
     this.showImages.endIndex += num;
     this.showImages.startIndex += num;
 }
-
+// 获取真实数量
 ImagePagation.prototype.getRealNum = function(direction, num) {
     var realNum = direction * num;
     if (direction > 0 && this.showImages.endIndex + direction * num > this.endIndex) {
@@ -157,7 +178,7 @@ ImagePagation.prototype.getRealNum = function(direction, num) {
     }
     realNum
 }
-
+// 绑定翻页事件
 ImagePagation.prototype.bindPageEvent = function() {
     var self = this,
         $pre = $(".image-pagation .pagation-pre"),
@@ -169,7 +190,7 @@ ImagePagation.prototype.bindPageEvent = function() {
         self.showImages.endIndex !== self.endIndex && this.turnPageThrottle(1, 7)
     })
 }
-
+// 图片点击事件
 ImagePagation.prototype.bindItemEvent = function() {
     var self = this;
     $(".panel .image-item").off("click").on({
@@ -180,7 +201,7 @@ ImagePagation.prototype.bindItemEvent = function() {
         }
     })
 }
-
+// 翻页
 ImagePagation.prototype.turnPage = function(direction, num) {
     var realNum = this.getRealNum(direction, num);
     this.getMoreData(direction, direction * num),
@@ -188,7 +209,7 @@ ImagePagation.prototype.turnPage = function(direction, num) {
     this.translate(direction, Math.abs(realNum)),
     this.setImagesIndex(realNum)
 }
-
+// 图片移动
 ImagePagation.prototype.slide = function(id) {
     var $item = $(".panel .image-item"),
         $activeItem = $(".panel .image-item[data-resourceId=" + id + "]"),

@@ -1,12 +1,13 @@
-<div class="dropdown drop-title"><div class="dropdown-header">
-    {{dropTile}}
-    <i class="icon-drop"></i>
-</div>
-<div class="dropdown-menu">
-    <div class="dropdown-content">
-        {{each sourceData item}}
-        <div class="dropdown-item">{{item.name}}</div>  
-        {{/each}}
+<div class="dropdown drop-title">
+    <div class="dropdown-header">
+        {{dropTile}}
+        <i class="icon-drop"></i>
     </div>
-</div>
+    <div class="dropdown-menu">
+        <div class="dropdown-content">
+            {{each sourceData item}}
+            <div class="dropdown-item">{{item.name}}</div>  
+            {{/each}}
+        </div>
+    </div>
 </div>

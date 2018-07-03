@@ -116,10 +116,10 @@
                         this.carouselItemWidth * -1 - (this.carouselItemWidth - this.startOffset),
                         this.endOffset = this.carouselItemWidth * (this.totalLength - 1) - Math.abs(this.startOffset)
                     ) : "common" === this.type && (this.startOffset = -1 * this.carouselItemWidth,
-                        this.endOffset = this.carouselItemWidth * (this.totalLength / 2 - 2)) : this.indicator = !1;
+                        this.endOffset = this.carouselItemWidth * (this.totalLength / 2 - 2)) : this.indicator = false;
                 this.$nextTick(function () {
-                    t.initTranslateX(),
-                        "common" === t.type && t.itemMove(t.carouselItemWidth, "initial-offset")
+                    this.initTranslateX();
+                    "common" === this.type && t.itemMove(t.carouselItemWidth, "initial-offset");
                 })
             },
             // 按钮显示、隐藏判断
@@ -247,15 +247,15 @@
             }
         },
          mounted: function () {
-            this.initData(),
-                this.setOffset(),
-                this.slide = throttle((val) => {
-                    this.iconMove(val),
-                    this.itemMove(val * this.carouselItemWidth * -1)
-                }, 300),
-                this.indicatorHover = throttle((index) => {
-                    this.indicatorEvent(index)
-                }, 200)
+            this.initData();
+            this.setOffset();
+            this.slide = throttle((val) => {
+                this.iconMove(val);
+                this.itemMove(val * this.carouselItemWidth * -1);
+            }, 300);
+            this.indicatorHover = throttle((index) => {
+                this.indicatorEvent(index);
+            }, 200);
         },
         beforeDestroy: function () {
             this.clear()
